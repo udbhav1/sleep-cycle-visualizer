@@ -1,0 +1,26 @@
+:root {
+  --main-bg-color: #000000;
+  --main-text-color: #FFFFFF;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: auto;
+  /* max-width: 38rem; */
+  padding: 2rem;
+  background-color: var(--main-bg-color);
+  width: 100%;
+  height: 100%;
+}
+
+/* p { */
+/*   color: var(--main-text-color); */
+/* } */
+
+/* h1 { */
+/*   color: var(--main-text-color); */
+/* } */
+
+/* section.main { */
+/*   background-color: #121212; */
+/* } */
