@@ -51,12 +51,23 @@ app.on('activate', () => {
 
 var sleepData = [];
 var labels = ['Start', 'End', 'Sleep Quality', 'Regularity', 'Mood', 'Heart rate (bpm)', 'Steps', 'Alarm mode', 'Air Pressure (Pa)', 'City', 'Movements per hour', 'Time in bed (seconds)', 'Time asleep (seconds)', 'Time before sleep (seconds)', 'Window start', 'Window stop', 'Did snore', 'Snore time', 'Weather temperature (¬∞F)', 'Weather type', 'Notes'];
+var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+function rearrangeDate(dateStr){
+    // sleep cycle formats as yyyy-mm-dd, but js works with mm-dd-yyyy
+    dateStr = dateStr.substr(5) + "-" + dateStr.substr(0, 4);
+    return dateStr;
+}
+function dayOfWeek(dateStr){
+    let d = new Date(dateStr);
+    return days[d.getDay()];
+}
 
 function parseCSV(filename) {
     const fs = require('fs');
 
     const data = fs.readFileSync(filename, {encoding:'utf8', flag:'r'});
-    var fileEntries = data.split("\n");
+    let fileEntries = data.split("\n");
     // get rid of labels
     // TODO assign labels array based on this instead of hardcoding
     fileEntries.shift();
@@ -66,23 +77,58 @@ function parseCSV(filename) {
         sleepData.push([]);
     }
 
+    // turn data from split rows to lists of each column
     for(var i = 0; i < fileEntries.length; i++){
         for(var j = 0; j < fileEntries[i].length; j++){
             sleepData[j].push(fileEntries[i][j]);
         }
     }
 
-    // entry for day of week
+    // split up Start and End into [date, time] and rearrange dates
+    for(var i = 0; i < sleepData[0].length; i++){
+        sleepData[0][i] = sleepData[0][i].split(" ");
+        sleepData[0][i][0] = rearrangeDate(sleepData[0][i][0]);
+        sleepData[1][i] = sleepData[1][i].split(" ");
+        sleepData[1][i][0] = rearrangeDate(sleepData[1][i][0]);
+    }
+
+    // create day of week data from start date
     sleepData.unshift([]);
     labels.unshift('Day of Week');
 
-    // TODO create day of week data from start and end
+    for(var i = 0; i < sleepData[1].length; i++){
+        sleepData[0].push(dayOfWeek(sleepData[1][i][0]));
+    }
 
-    console.log(sleepData[0]);
-    console.log(sleepData[1]);
-    console.log(sleepData.length);
+    // turn relevant cols into numbers
+    // TODO read this from an external file so only have to change once
+    // ^ same with every reference to a specific column
+    let intCols = ['Sleep Quality', 'Regularity', 'Heart rate (bpm)', 'Steps'];
 
-    return sleepData[0];
+    let floatCols = ['Air Pressure (Pa)', 'Movements per hour', 'Time in bed (seconds)', 'Time asleep (seconds)', 'Time before sleep (seconds)', 'Snore time'];
+
+    for(var col of intCols){
+        let ri = labels.indexOf(col);
+        if(ri > -1){
+            for(var i = 0; i < sleepData[ri].length; i++){
+                sleepData[ri][i] = parseInt(sleepData[ri][i]);
+            }
+        }
+    }
+
+    for(var col of floatCols){
+        let ri = labels.indexOf(col);
+        if(ri > -1){
+            for(var i = 0; i < sleepData[ri].length; i++){
+                sleepData[ri][i] = parseFloat(sleepData[ri][i]);
+            }
+        }
+    }
+
+    // TODO turn time in bed and time asleep into minutes/hours
+
+    console.log(labels);
+    return [sleepData, labels];
 }
 
 const { ipcMain } = require('electron');
