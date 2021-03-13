@@ -1,26 +1,53 @@
 :root {
   --main-bg-color: #FFFFFF;
   --main-text-color: #FFFFFF;
+  --sidebar-width: 200px;
 }
 
+html {
+  height: 100%;
+}
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   margin: auto;
   /* max-width: 38rem; */
-  padding: 2rem;
+  padding: 0;
   background-color: var(--main-bg-color);
   width: 100%;
   height: 100%;
 }
 
-/* p { */
-/*   color: var(--main-text-color); */
-/* } */
+#sidebar {
+  margin: 0;
+  padding: 0;
+  background-color: #f1f1f1;
+  height: 100%;
+  width: var(--sidebar-width);
+  position: fixed;
+  overflow: auto;
+}
 
-/* h1 { */
-/*   color: var(--main-text-color); */
-/* } */
+#mainContainer {
+  width: 100%;
+  height: 100%;
+}
 
-/* section.main { */
-/*   background-color: #121212; */
-/* } */
+#chartOptions {
+  height:15%;
+  width:100%;
+  background-color: #000000;
+}
+
+#chartContainer {
+  height:70%;
+  width:90%;
+  background-color: #f1f1f1;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+section.main {
+  margin-left: var(--sidebar-width);
+  height:100%;
+  /* padding: 1px 16px; */
+}

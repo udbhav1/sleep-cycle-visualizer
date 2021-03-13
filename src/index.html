@@ -11,18 +11,53 @@
 </head>
 
 <body>
+    <div id="sidebar">
+        <aside class="menu">
+            <!-- <p class="menu-label"> -->
+            <!--     Navigation -->
+            <!-- </p> -->
+            <ul class="menu-list">
+                <li>
+                <a class="is-active">Navigation</a>
+                <ul>
+                    <!-- TODO make currently selected one stand out -->
+                    <li><a onclick="dayFrequency()">Day Frequency</a></li>
+                    <li><a onclick="sleepQuality()">Sleep Quality</a></li>
+                    <li><a>Add a member</a></li>
+                    <li><a>Add a member</a></li>
+                    <li><a>Add a member</a></li>
+                    <li><a>Add a member</a></li>
+                    <li><a>Add a member</a></li>
+                    <li><a>Add a member</a></li>
+                    <li><a>Add a member</a></li>
+                    <li><a>Add a member</a></li>
+                    <li><a>Add a member</a></li>
+                    <li><a>Add a member</a></li>
+                    <li><a>Add a member</a></li>
+                    <li><a>Add a member</a></li>
+                    <li><a>Add a member</a></li>
+                </ul>
+                </li>
+            </ul>
+        </aside>
+    </div>
     <section class="main">
-        <div class="container">
-            <h1 class="title has-text-light">
-                Hello World
-            </h1>
-            <p class="subtitle has-text-light">
-                Sample text
-            </p>
+        <div id="mainContainer">
+            <!-- <h1 class="title has-text-light"> -->
+            <!--     Hello World -->
+            <!-- </h1> -->
+            <!-- <p class="subtitle has-text-light"> -->
+            <!--     Sample text -->
+            <!-- </p> -->
             <button class="button" id="btnBrowse" onclick="getData()"><strong>Visualize</strong></button>
 
-            <p id="test" class="subtitle has-text-light">a</p>
-            <canvas id="myChart" width="400" height="400"></canvas>
+            <!-- TODO fill -->
+            <div id="chartOptions">
+                <p style="color:white;">chart title and options</p>
+            </div>
+            <div id="chartContainer">
+                <canvas id="mainChart" style="width:100%;height:100%"></canvas>
+            </div>
         </div>
     </section>
 </body>
