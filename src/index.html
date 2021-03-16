@@ -11,6 +11,17 @@
 </head>
 
 <body>
+    <div class="modal is-active" id="overlay">
+        <div class="modal-content">
+            <div id="modalTextAndButton">
+                <p id="modalText">Sleep Cycle Visualizer</p>
+                <div id="modalButton">
+                    <button class="button" id="btnBrowse" onclick="getData()"><strong>Select Data</strong></button>
+                </div>
+            </div>
+        </div>
+        <!-- <button class="modal-close is-large" aria-label="close"></button> -->
+    </div>
     <div id="sidebar">
         <aside class="menu">
             <!-- <p class="menu-label"> -->
@@ -18,26 +29,23 @@
             <!-- </p> -->
             <ul class="menu-list">
                 <li>
-                <a class="is-active">Navigation</a>
+                <a>Day of Week</a>
                 <ul>
                     <!-- TODO make currently selected one stand out -->
-                    <li><a onclick="dayFrequency()">Day Frequency</a></li>
-                    <li><a onclick="sleepQuality()">Sleep Quality</a></li>
-                    <li><a>Add a member</a></li>
-                    <li><a>Add a member</a></li>
-                    <li><a>Add a member</a></li>
-                    <li><a>Add a member</a></li>
-                    <li><a>Add a member</a></li>
-                    <li><a>Add a member</a></li>
-                    <li><a>Add a member</a></li>
-                    <li><a>Add a member</a></li>
-                    <li><a>Add a member</a></li>
-                    <li><a>Add a member</a></li>
-                    <li><a>Add a member</a></li>
-                    <li><a>Add a member</a></li>
-                    <li><a>Add a member</a></li>
+                    <li><a onclick="dayFrequency()">Frequency</a></li>
+                    <li><a onclick="dayQuality()">Quality</a></li>
+                    <li><a onclick="dayRegularity()">Regularity</a></li>
                 </ul>
                 </li>
+                <li>
+                <a>Over Time</a>
+                <ul>
+                    <!-- TODO make currently selected one stand out -->
+                    <li><a onclick="sleepQuality()">Quality</a></li>
+                    <li><a onclick="sleepRegularity()">Regularity</a></li>
+                </ul>
+                </li>
+
             </ul>
         </aside>
     </div>
@@ -49,11 +57,10 @@
             <!-- <p class="subtitle has-text-light"> -->
             <!--     Sample text -->
             <!-- </p> -->
-            <button class="button" id="btnBrowse" onclick="getData()"><strong>Visualize</strong></button>
 
             <!-- TODO fill -->
             <div id="chartOptions">
-                <p style="color:white;">chart title and options</p>
+                <p id="chartTitle"></p>
             </div>
             <div id="chartContainer">
                 <canvas id="mainChart" style="width:100%;height:100%"></canvas>

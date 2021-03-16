@@ -17,14 +17,13 @@ var chartColors = {
 var color = Chart.helpers.color;
 
 // globals
-var sleepData, labels, dayCounts;
+var sleepData, labels, weekdayCounts, weekdayData;
 var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 var mainChart;
 
 function dayFrequency(){
-    console.log("dayFrequency");
-    // TODO make global pending dynamic update changes
+    // TODO make global
     var ctx = document.getElementById('mainChart').getContext('2d');
     // reset canvas
     if (mainChart != null){
@@ -36,7 +35,7 @@ function dayFrequency(){
             labels: days,
             datasets: [{
                 label: '# of Occurrences',
-                data: dayCounts,
+                data: weekdayCounts,
                 // backgroundColor: 'rgba(147, 112, 219, 0.8)',
                 backgroundColor: color(chartColors.red).alpha(0.8).rgbString(),
                 borderWidth: 1
@@ -53,10 +52,82 @@ function dayFrequency(){
             }
         }
     });
+    var chartTitle = document.getElementById('chartTitle');
+    chartTitle.innerHTML = "Day of Week vs Frequency";
+}
+
+function dayQuality(){
+    var ctx = document.getElementById('mainChart').getContext('2d');
+    // reset canvas
+    if (mainChart != null){
+        mainChart.destroy();
+    }
+    mainChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: days,
+            datasets: [{
+                label: 'Avg Quality',
+                // get index 3 of every day's aggregated data
+                data: _.map(weekdayData, function(dayData) {
+                    return dayData[labels.indexOf('Sleep Quality')];
+                }),
+                // backgroundColor: 'rgba(147, 112, 219, 0.8)',
+                backgroundColor: color(chartColors.red).alpha(0.8).rgbString(),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+    var chartTitle = document.getElementById('chartTitle');
+    chartTitle.innerHTML = "Day of Week vs Sleep Quality";
+}
+
+function dayRegularity(){
+    var ctx = document.getElementById('mainChart').getContext('2d');
+    // reset canvas
+    if (mainChart != null){
+        mainChart.destroy();
+    }
+    mainChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: days,
+            datasets: [{
+                label: 'Avg Regularity',
+                data: _.map(weekdayData, function(dayData) {
+                    return dayData[labels.indexOf('Regularity')];
+                }),
+                // backgroundColor: 'rgba(147, 112, 219, 0.8)',
+                backgroundColor: color(chartColors.red).alpha(0.8).rgbString(),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+    var chartTitle = document.getElementById('chartTitle');
+    chartTitle.innerHTML = "Day of Week vs Sleep Regularity";
 }
 
 function sleepQuality(){
-    console.log("sleepQuality");
     var ctx = document.getElementById('mainChart').getContext('2d');
     // reset canvas
     if (mainChart != null){
@@ -70,7 +141,7 @@ function sleepQuality(){
                 return entry[0]; 
             }),
             datasets: [{
-                label: "Sleep Quality",
+                label: "Quality",
                 data: sleepData[labels.indexOf('Sleep Quality')],
                 backgroundColor: color(chartColors.red).alpha(0.8).rgbString(),
                 borderWidth: 1
@@ -87,6 +158,43 @@ function sleepQuality(){
             }
         }
     });
+    var chartTitle = document.getElementById('chartTitle');
+    chartTitle.innerHTML = "Sleep Quality over Time";
+}
+
+function sleepRegularity(){
+    var ctx = document.getElementById('mainChart').getContext('2d');
+    // reset canvas
+    if (mainChart != null){
+        mainChart.destroy();
+    }
+    mainChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            // get only dates
+            labels: _.map(sleepData[labels.indexOf('Start')], function(entry) {
+                return entry[0];
+            }),
+            datasets: [{
+                label: "Regularity",
+                data: sleepData[labels.indexOf('Regularity')],
+                backgroundColor: color(chartColors.red).alpha(0.8).rgbString(),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+    var chartTitle = document.getElementById('chartTitle');
+    chartTitle.innerHTML = "Sleep Regularity over Time";
 }
 
 function removeNaps(data, labels, threshold){
@@ -183,8 +291,6 @@ function dayOfWeekStats(days, data, labels){
 }
 
 function getData() {
-    console.log("called");
-
     let result = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
         properties: ["openFile"],
         filters: [
@@ -202,8 +308,6 @@ function getData() {
 
     if (typeof result === "object") {
         let filePath = result[0];
-        console.log("from renderer: " + filePath);
-
         // TODO make replacement button same size
         // const browseBtn = document.getElementById("btnBrowse");
         // const spinBtn = document.createElement('a');
@@ -216,16 +320,11 @@ function getData() {
         const thresh = 60*120;
         let newData = removeNaps(sleepData, labels, thresh);
 
-        let d1 = "05-20-2019";
-        let d3 = "06-01-2020";
-        let customData = customDomain(sleepData, d1, d3);
+        [weekdayCounts, weekdayData] = dayOfWeekStats(days, removeNaps(sleepData, labels, thresh), labels);
 
-        [dayCounts, customData] = dayOfWeekStats(days, removeNaps(sleepData, labels, thresh), labels);
-
-        // remove button, switch to main view
-        const browseBtn = document.getElementById("btnBrowse");
-        browseBtn.remove();
-        console.log(sleepData[1]);
+        // remove overlay, switch to main view
+        const modalOverlay = document.getElementById("overlay");
+        modalOverlay.remove();
 
         dayFrequency();
         // TODO add all graphs

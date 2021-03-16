@@ -1,6 +1,7 @@
 :root {
   --main-bg-color: #FFFFFF;
   --main-text-color: #FFFFFF;
+  --overlay-bg-color: #000000;
   --sidebar-width: 200px;
 }
 
@@ -9,6 +10,7 @@ html {
 }
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif; */
   margin: auto;
   /* max-width: 38rem; */
   padding: 0;
@@ -33,21 +35,86 @@ body {
 }
 
 #chartOptions {
-  height:15%;
-  width:100%;
-  background-color: #000000;
+  height: 15%;
+  width: 100%;
+  text-align: center;
+  position: relative;
+}
+
+#chartTitle {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  font-size: 22px;
 }
 
 #chartContainer {
-  height:70%;
-  width:90%;
-  background-color: #f1f1f1;
+  height: 70%;
+  width: 90%;
   margin-left: auto;
   margin-right: auto;
 }
 
+.modal-content {
+  max-height: calc(100vh);
+  height: 100%;
+  width: 100%;
+  background-color: var(--overlay-bg-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#modalTextAndButton {
+  width: 75%;
+  height: 50%;
+  text-align: center;
+}
+
+/* fade in from bottom */
+#modalTextAndButton {
+  animation-duration: 1s;
+  animation-fill-mode: both;
+  animation-name: fadeInBottom;
+}
+
+@keyframes fadeInBottom {
+    from {
+        opacity: 0;
+        transform: translateY(5%);
+    }
+    to { opacity: 1 }
+}
+
+/* standard fade in */ 
+/* #modalTextAndButton { */
+/*   -webkit-animation: fadein 3s; /1* Safari, Chrome and Opera > 12.1 *1/ */
+/* } */
+/* @keyframes fadein { */
+/*   from { opacity: 0; } */
+/*   to   { opacity: 1; } */
+/* } */
+
+/* @webkit-keyframes fadein { */
+/*   from { opacity: 0; } */
+/*   to   { opacity: 1; } */
+/* } */
+
+#modalText {
+  font-size: 75px;
+  font-family: Menlo;
+  color: #FFFFFF;
+}
+
+#modalButton {
+  padding-top: 7%;
+}
+
+#btnBrowse {
+  font: inherit;
+}
+
 section.main {
   margin-left: var(--sidebar-width);
-  height:100%;
-  /* padding: 1px 16px; */
+  height: 100%;
 }

@@ -21,7 +21,7 @@ const createWindow = () => {
     mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
@@ -127,12 +127,11 @@ function parseCSV(filename) {
 
     // TODO turn time in bed and time asleep into minutes/hours
 
-    console.log(labels);
+    // console.log(labels);
     return [sleepData, labels];
 }
 
 const { ipcMain } = require('electron');
 ipcMain.on('synchronous-message', (event, arg) => {
-    console.log("from main: " + arg);
     event.returnValue = parseCSV(arg);
 })
