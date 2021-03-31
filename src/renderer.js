@@ -19,191 +19,143 @@ var color = Chart.helpers.color;
 // globals
 var sleepData, filteredData, labels, weekdayCounts, weekdayData;
 var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-var currentGraph;
+var currentChart = "dayFrequency";
 var mainChart;
 
-function dayFrequency(){
-    currentGraph = "dayFrequency";
-    // TODO make global
-    var ctx = document.getElementById('mainChart').getContext('2d');
-    // reset canvas
-    if (mainChart != null){
-        mainChart.destroy();
-    }
-    mainChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: days,
-            datasets: [{
-                label: '# of Occurrences',
-                data: weekdayCounts,
-                // backgroundColor: 'rgba(147, 112, 219, 0.8)',
-                backgroundColor: color(chartColors.red).alpha(0.8).rgbString(),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            maintainAspectRatio: false,
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }]
-            }
-        }
-    });
-    var chartTitle = document.getElementById('chartTitle');
-    chartTitle.innerHTML = "Day of Week vs Frequency";
-}
+// used by day of week stats function
+var numericalCols = ['Sleep Quality', 'Regularity', 'Heart rate (bpm)', 'Steps', 'Air Pressure (Pa)', 'Movements per hour', 'Time in bed (seconds)', 'Time asleep (seconds)', 'Time before sleep (seconds)', 'Snore time'];
 
-function dayQuality(){
-    currentGraph = "dayQuality";
-    var ctx = document.getElementById('mainChart').getContext('2d');
-    // reset canvas
-    if (mainChart != null){
-        mainChart.destroy();
+// all charts described by objects
+var dayFrequency = {
+    type            : "bar",
+    title           : "Day of Week vs Frequency",
+    dataDescription : "# of Occurences",
+    xAxis           : days,
+    data            : function() {
+        return weekdayCounts;
     }
-    mainChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: days,
-            datasets: [{
-                label: 'Avg Quality',
-                // get index 3 of every day's aggregated data
-                data: _.map(weekdayData, function(dayData) {
+};
+
+var dayQuality = {
+    type            : "bar",
+    title           : "Day of Week vs Sleep Quality",
+    dataDescription : "Avg Quality",
+    xAxis           : days,
+    data            : function() {
+        return _.map(weekdayData, function(dayData) {
                     return dayData[labels.indexOf('Sleep Quality')];
-                }),
-                // backgroundColor: 'rgba(147, 112, 219, 0.8)',
-                backgroundColor: color(chartColors.red).alpha(0.8).rgbString(),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            maintainAspectRatio: false,
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }]
-            }
-        }
-    });
-    var chartTitle = document.getElementById('chartTitle');
-    chartTitle.innerHTML = "Day of Week vs Sleep Quality";
-}
-
-function dayRegularity(){
-    currentGraph = "dayRegularity";
-    var ctx = document.getElementById('mainChart').getContext('2d');
-    // reset canvas
-    if (mainChart != null){
-        mainChart.destroy();
+                });
     }
-    mainChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: days,
-            datasets: [{
-                label: 'Avg Regularity',
-                data: _.map(weekdayData, function(dayData) {
+};
+
+var dayRegularity = {
+    type            : "bar",
+    title           : "Day of Week vs Sleep Regularity",
+    dataDescription : "Avg Regularity",
+    xAxis           : days,
+    data            : function() {
+        return _.map(weekdayData, function(dayData) {
                     return dayData[labels.indexOf('Regularity')];
-                }),
-                // backgroundColor: 'rgba(147, 112, 219, 0.8)',
-                backgroundColor: color(chartColors.red).alpha(0.8).rgbString(),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            maintainAspectRatio: false,
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }]
-            }
-        }
-    });
-    var chartTitle = document.getElementById('chartTitle');
-    chartTitle.innerHTML = "Day of Week vs Sleep Regularity";
-}
-
-function dayTimeInBed(){
-    currentGraph = "dayTimeInBed";
-    var ctx = document.getElementById('mainChart').getContext('2d');
-    // reset canvas
-    if (mainChart != null){
-        mainChart.destroy();
+                });
     }
-    mainChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: days,
-            datasets: [{
-                label: 'Avg Time in Bed',
-                data: _.map(weekdayData, function(dayData) {
+};
+
+var dayTimeInBed = {
+    type            : "bar",
+    title           : "Day of Week vs Time in Bed",
+    dataDescription : "Avg Time in Bed",
+    xAxis           : days,
+    data            : function() {
+        return _.map(weekdayData, function(dayData) {
                     return dayData[labels.indexOf('Time in bed (seconds)')];
-                }),
-                // backgroundColor: 'rgba(147, 112, 219, 0.8)',
-                backgroundColor: color(chartColors.red).alpha(0.8).rgbString(),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            maintainAspectRatio: false,
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }]
-            }
-        }
-    });
-    var chartTitle = document.getElementById('chartTitle');
-    chartTitle.innerHTML = "Day of Week vs Time in Bed";
-}
-
-function dayTimeAsleep(){
-    currentGraph = "dayTimeAsleep";
-    var ctx = document.getElementById('mainChart').getContext('2d');
-    // reset canvas
-    if (mainChart != null){
-        mainChart.destroy();
+                });
     }
-    mainChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: days,
-            datasets: [{
-                label: 'Avg Time Asleep',
-                data: _.map(weekdayData, function(dayData) {
+};
+
+var dayTimeInBed = {
+    type            : "bar",
+    title           : "Day of Week vs Time in Bed",
+    dataDescription : "Avg Time in Bed",
+    xAxis           : days,
+    data            : function() {
+        return _.map(weekdayData, function(dayData) {
+                    return dayData[labels.indexOf('Time in bed (seconds)')];
+                });
+    }
+};
+
+var dayTimeAsleep = {
+    title           : "Day of Week vs Time Asleep",
+    dataDescription : "Avg Time Asleep",
+    xAxis           : days,
+    data            : function() {
+        return _.map(weekdayData, function(dayData) {
                     return dayData[labels.indexOf('Time asleep (seconds)')];
-                }),
-                // backgroundColor: 'rgba(147, 112, 219, 0.8)',
-                backgroundColor: color(chartColors.red).alpha(0.8).rgbString(),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            maintainAspectRatio: false,
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }]
-            }
-        }
-    });
-    var chartTitle = document.getElementById('chartTitle');
-    chartTitle.innerHTML = "Day of Week vs Time Asleep";
+                });
+    }
+};
+
+var dayTimeBeforeSleep = {
+    type            : "bar",
+    title           : "Day of Week vs Time Before Sleep",
+    dataDescription : "Avg Time Before Sleep",
+    xAxis           : days,
+    data            : function() {
+        return _.map(weekdayData, function(dayData) {
+                    return dayData[labels.indexOf('Time before sleep (seconds)')];
+                });
+    }
+};
+
+var sleepQuality = {
+    type            : "line",
+    title           : "Sleep Quality over Time",
+    dataDescription : "Quality",
+    xAxis           : function() {
+        return _.map(filteredData[labels.indexOf('Start')], function(entry) {
+                    return entry[0]; 
+                });
+    },
+    data            : function() {
+        return filteredData[labels.indexOf('Sleep Quality')]
+    }
+};
+
+var sleepRegularity = {
+    type            : "line",
+    title           : "Sleep Regularity over Time",
+    dataDescription : "Regularity",
+    xAxis           : function() {
+        return _.map(filteredData[labels.indexOf('Start')], function(entry) {
+                    return entry[0];
+                });
+    },
+    data            : function() {
+        return filteredData[labels.indexOf('Regularity')]
+    }
+};
+
+// used to find correct chart object and to set current chart for reload
+var charts = {
+    "dayFrequency": dayFrequency,
+    "dayQuality": dayQuality,
+    "dayRegularity": dayRegularity,
+    "dayTimeInBed": dayTimeInBed,
+    "dayTimeAsleep": dayTimeAsleep,
+    "dayTimeBeforeSleep": dayTimeBeforeSleep,
+    "sleepQuality": sleepQuality,
+    "sleepRegularity": sleepRegularity
 }
 
-function dayTimeBeforeSleep(){
-    currentGraph = "dayTimeBeforeSleep";
+function barGraph(name){
+    currentChart = name;
+    // retrieve fields
+    chartObj = charts[name];
+    let title = chartObj.title;
+    let description = chartObj.dataDescription;
+    let xLabels = chartObj.xAxis;
+    let chartData = chartObj.data();
+
     var ctx = document.getElementById('mainChart').getContext('2d');
     // reset canvas
     if (mainChart != null){
@@ -212,12 +164,10 @@ function dayTimeBeforeSleep(){
     mainChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: days,
+            labels: xLabels,
             datasets: [{
-                label: 'Avg Time Before Sleep',
-                data: _.map(weekdayData, function(dayData) {
-                    return dayData[labels.indexOf('Time before sleep (seconds)')];
-                }),
+                label: description,
+                data: chartData,
                 // backgroundColor: 'rgba(147, 112, 219, 0.8)',
                 backgroundColor: color(chartColors.red).alpha(0.8).rgbString(),
                 borderWidth: 1
@@ -235,11 +185,18 @@ function dayTimeBeforeSleep(){
         }
     });
     var chartTitle = document.getElementById('chartTitle');
-    chartTitle.innerHTML = "Day of Week vs Time Before Sleep";
+    chartTitle.innerHTML = title;
 }
 
-function sleepQuality(){
-    currentGraph = "sleepQuality";
+function lineGraph(name){
+    currentChart = name;
+    // retrieve fields
+    chartObj = charts[name];
+    let title = chartObj.title;
+    let description = chartObj.dataDescription;
+    let xLabels = chartObj.xAxis();
+    let chartData = chartObj.data();
+
     var ctx = document.getElementById('mainChart').getContext('2d');
     // reset canvas
     if (mainChart != null){
@@ -249,12 +206,10 @@ function sleepQuality(){
         type: 'line',
         data: {
             // get only dates
-            labels: _.map(filteredData[labels.indexOf('Start')], function(entry) {
-                return entry[0]; 
-            }),
+            labels: xLabels,
             datasets: [{
-                label: "Quality",
-                data: filteredData[labels.indexOf('Sleep Quality')],
+                label: description,
+                data: chartData,
                 backgroundColor: color(chartColors.red).alpha(0.8).rgbString(),
                 borderWidth: 1
             }]
@@ -271,43 +226,7 @@ function sleepQuality(){
         }
     });
     var chartTitle = document.getElementById('chartTitle');
-    chartTitle.innerHTML = "Sleep Quality over Time";
-}
-
-function sleepRegularity(){
-    currentGraph = "sleepRegularity";
-    var ctx = document.getElementById('mainChart').getContext('2d');
-    // reset canvas
-    if (mainChart != null){
-        mainChart.destroy();
-    }
-    mainChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            // get only dates
-            labels: _.map(filteredData[labels.indexOf('Start')], function(entry) {
-                return entry[0];
-            }),
-            datasets: [{
-                label: "Regularity",
-                data: filteredData[labels.indexOf('Regularity')],
-                backgroundColor: color(chartColors.red).alpha(0.8).rgbString(),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            maintainAspectRatio: false,
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }]
-            }
-        }
-    });
-    var chartTitle = document.getElementById('chartTitle');
-    chartTitle.innerHTML = "Sleep Regularity over Time";
+    chartTitle.innerHTML = title;
 }
 
 function removeNaps(data, threshold){
@@ -365,8 +284,6 @@ function customDomain(data, start, end){
 }
 
 function dayOfWeekStats(days, data){
-    let numericalCols = ['Sleep Quality', 'Regularity', 'Heart rate (bpm)', 'Steps', 'Air Pressure (Pa)', 'Movements per hour', 'Time in bed (seconds)', 'Time asleep (seconds)', 'Time before sleep (seconds)', 'Snore time'];
-
     let numericalColIndices = [];
     
     for(var col of numericalCols){
@@ -404,33 +321,12 @@ function dayOfWeekStats(days, data){
 }
 
 function reloadGraph(){
-    switch(currentGraph){
-        case "dayFrequency":
-            dayFrequency();
-            break;
-        case "dayQuality":
-            dayQuality();
-            break;
-        case "dayRegularity":
-            dayRegularity();
-            break;
-        case "dayTimeInBed":
-            dayTimeInBed();
-            break;
-        case "dayTimeAsleep":
-            dayTimeAsleep();
-            break;
-        case "dayTimeBeforeSleep":
-            dayTimeBeforeSleep();
-            break;
-        case "sleepQuality":
-            sleepQuality();
-            break;
-        case "sleepRegularity":
-            sleepRegularity();
-            break;
-        default:
-            dayFrequency();
+    let type = charts[currentChart].type;
+    if(type == "bar"){    
+        barGraph(currentChart);
+    }
+    else if(type == "line"){
+        lineGraph(currentChart);
     }
 }
 
@@ -459,7 +355,7 @@ function getData(){
     let result = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
         properties: ["openFile"],
         filters: [
-            // TODO figure out if parsing xlsx is different
+            // TODO parse xlsx as well
             {
                 name: 'Spreadsheets',
                 extensions: ['csv', 'xlsx']
