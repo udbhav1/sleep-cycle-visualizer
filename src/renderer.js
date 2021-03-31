@@ -19,6 +19,7 @@ var color = Chart.helpers.color;
 // globals
 var sleepData, filteredData, labels, weekdayCounts, weekdayData;
 var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+var napThreshold = 2;
 var currentChart = "dayFrequency";
 var mainChart;
 
@@ -30,7 +31,9 @@ var dayFrequency = {
     type            : "bar",
     title           : "Day of Week vs Frequency",
     dataDescription : "# of Occurences",
-    xAxis           : days,
+    xAxis           : function() {
+        return days;
+    },
     data            : function() {
         return weekdayCounts;
     }
@@ -40,7 +43,9 @@ var dayQuality = {
     type            : "bar",
     title           : "Day of Week vs Sleep Quality",
     dataDescription : "Avg Quality",
-    xAxis           : days,
+    xAxis           : function() {
+        return days;
+    },
     data            : function() {
         return _.map(weekdayData, function(dayData) {
                     return dayData[labels.indexOf('Sleep Quality')];
@@ -52,7 +57,9 @@ var dayRegularity = {
     type            : "bar",
     title           : "Day of Week vs Sleep Regularity",
     dataDescription : "Avg Regularity",
-    xAxis           : days,
+    xAxis           : function() {
+        return days;
+    },
     data            : function() {
         return _.map(weekdayData, function(dayData) {
                     return dayData[labels.indexOf('Regularity')];
@@ -64,7 +71,9 @@ var dayTimeInBed = {
     type            : "bar",
     title           : "Day of Week vs Time in Bed",
     dataDescription : "Avg Time in Bed",
-    xAxis           : days,
+    xAxis           : function() {
+        return days;
+    },
     data            : function() {
         return _.map(weekdayData, function(dayData) {
                     return dayData[labels.indexOf('Time in bed (seconds)')];
@@ -76,7 +85,9 @@ var dayTimeInBed = {
     type            : "bar",
     title           : "Day of Week vs Time in Bed",
     dataDescription : "Avg Time in Bed",
-    xAxis           : days,
+    xAxis           : function() {
+        return days;
+    },
     data            : function() {
         return _.map(weekdayData, function(dayData) {
                     return dayData[labels.indexOf('Time in bed (seconds)')];
@@ -85,9 +96,12 @@ var dayTimeInBed = {
 };
 
 var dayTimeAsleep = {
+    type            : "bar",
     title           : "Day of Week vs Time Asleep",
     dataDescription : "Avg Time Asleep",
-    xAxis           : days,
+    xAxis           : function() {
+        return days;
+    },
     data            : function() {
         return _.map(weekdayData, function(dayData) {
                     return dayData[labels.indexOf('Time asleep (seconds)')];
@@ -99,7 +113,9 @@ var dayTimeBeforeSleep = {
     type            : "bar",
     title           : "Day of Week vs Time Before Sleep",
     dataDescription : "Avg Time Before Sleep",
-    xAxis           : days,
+    xAxis           : function() {
+        return days;
+    },
     data            : function() {
         return _.map(weekdayData, function(dayData) {
                     return dayData[labels.indexOf('Time before sleep (seconds)')];
@@ -147,51 +163,11 @@ var charts = {
     "sleepRegularity": sleepRegularity
 }
 
-function barGraph(name){
+function createChart(name){
     currentChart = name;
     // retrieve fields
     chartObj = charts[name];
-    let title = chartObj.title;
-    let description = chartObj.dataDescription;
-    let xLabels = chartObj.xAxis;
-    let chartData = chartObj.data();
-
-    var ctx = document.getElementById('mainChart').getContext('2d');
-    // reset canvas
-    if (mainChart != null){
-        mainChart.destroy();
-    }
-    mainChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: xLabels,
-            datasets: [{
-                label: description,
-                data: chartData,
-                // backgroundColor: 'rgba(147, 112, 219, 0.8)',
-                backgroundColor: color(chartColors.red).alpha(0.8).rgbString(),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            maintainAspectRatio: false,
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }]
-            }
-        }
-    });
-    var chartTitle = document.getElementById('chartTitle');
-    chartTitle.innerHTML = title;
-}
-
-function lineGraph(name){
-    currentChart = name;
-    // retrieve fields
-    chartObj = charts[name];
+    let chartType = chartObj.type;
     let title = chartObj.title;
     let description = chartObj.dataDescription;
     let xLabels = chartObj.xAxis();
@@ -203,13 +179,13 @@ function lineGraph(name){
         mainChart.destroy();
     }
     mainChart = new Chart(ctx, {
-        type: 'line',
+        type: chartType,
         data: {
-            // get only dates
             labels: xLabels,
             datasets: [{
                 label: description,
                 data: chartData,
+                // backgroundColor: 'rgba(147, 112, 219, 0.8)',
                 backgroundColor: color(chartColors.red).alpha(0.8).rgbString(),
                 borderWidth: 1
             }]
@@ -320,17 +296,7 @@ function dayOfWeekStats(days, data){
 
 }
 
-function reloadGraph(){
-    let type = charts[currentChart].type;
-    if(type == "bar"){    
-        barGraph(currentChart);
-    }
-    else if(type == "line"){
-        lineGraph(currentChart);
-    }
-}
-
-function updateData(napThreshold){
+function updateData(){
     const startDateBox = document.getElementById("startDate");
     const endDateBox = document.getElementById("endDate");
 
@@ -348,7 +314,7 @@ function updateData(napThreshold){
 
     [weekdayCounts, weekdayData] = dayOfWeekStats(days, filteredData);
 
-    reloadGraph();
+    createChart(currentChart);
 }
 
 function getData(){
@@ -390,9 +356,7 @@ function getData(){
         startDateBox.value = firstDate;
         endDateBox.value = lastDate;
 
-        // nap threshold
-        const thresh = 2;
-        updateData(thresh);
+        updateData();
 
         // remove overlay, switch to main view
         const modalOverlay = document.getElementById("overlay");
