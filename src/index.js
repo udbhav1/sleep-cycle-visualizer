@@ -125,7 +125,17 @@ function parseCSV(filename) {
         }
     }
 
-    // TODO turn time in bed and time asleep into minutes/hours
+    // turn time cols into hours
+    let timeCols = ["Time in bed (seconds)", "Time asleep (seconds)", "Time before sleep (seconds)"];
+
+    for(var col of timeCols){
+        let ri = labels.indexOf(col);
+        if(ri > -1){
+            for(var i = 0; i < sleepData[ri].length; i++){
+                sleepData[ri][i] = sleepData[ri][i]/3600;
+            }
+        }
+    }
 
     // console.log(labels);
     return [sleepData, labels];

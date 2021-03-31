@@ -130,6 +130,114 @@ function dayRegularity(){
     chartTitle.innerHTML = "Day of Week vs Sleep Regularity";
 }
 
+function dayTimeInBed(){
+    currentGraph = "dayTimeInBed";
+    var ctx = document.getElementById('mainChart').getContext('2d');
+    // reset canvas
+    if (mainChart != null){
+        mainChart.destroy();
+    }
+    mainChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: days,
+            datasets: [{
+                label: 'Avg Time in Bed',
+                data: _.map(weekdayData, function(dayData) {
+                    return dayData[labels.indexOf('Time in bed (seconds)')];
+                }),
+                // backgroundColor: 'rgba(147, 112, 219, 0.8)',
+                backgroundColor: color(chartColors.red).alpha(0.8).rgbString(),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+    var chartTitle = document.getElementById('chartTitle');
+    chartTitle.innerHTML = "Day of Week vs Time in Bed";
+}
+
+function dayTimeAsleep(){
+    currentGraph = "dayTimeAsleep";
+    var ctx = document.getElementById('mainChart').getContext('2d');
+    // reset canvas
+    if (mainChart != null){
+        mainChart.destroy();
+    }
+    mainChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: days,
+            datasets: [{
+                label: 'Avg Time Asleep',
+                data: _.map(weekdayData, function(dayData) {
+                    return dayData[labels.indexOf('Time asleep (seconds)')];
+                }),
+                // backgroundColor: 'rgba(147, 112, 219, 0.8)',
+                backgroundColor: color(chartColors.red).alpha(0.8).rgbString(),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+    var chartTitle = document.getElementById('chartTitle');
+    chartTitle.innerHTML = "Day of Week vs Time Asleep";
+}
+
+function dayTimeBeforeSleep(){
+    currentGraph = "dayTimeBeforeSleep";
+    var ctx = document.getElementById('mainChart').getContext('2d');
+    // reset canvas
+    if (mainChart != null){
+        mainChart.destroy();
+    }
+    mainChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: days,
+            datasets: [{
+                label: 'Avg Time Before Sleep',
+                data: _.map(weekdayData, function(dayData) {
+                    return dayData[labels.indexOf('Time before sleep (seconds)')];
+                }),
+                // backgroundColor: 'rgba(147, 112, 219, 0.8)',
+                backgroundColor: color(chartColors.red).alpha(0.8).rgbString(),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+    var chartTitle = document.getElementById('chartTitle');
+    chartTitle.innerHTML = "Day of Week vs Time Before Sleep";
+}
+
 function sleepQuality(){
     currentGraph = "sleepQuality";
     var ctx = document.getElementById('mainChart').getContext('2d');
@@ -306,6 +414,15 @@ function reloadGraph(){
         case "dayRegularity":
             dayRegularity();
             break;
+        case "dayTimeInBed":
+            dayTimeInBed();
+            break;
+        case "dayTimeAsleep":
+            dayTimeAsleep();
+            break;
+        case "dayTimeBeforeSleep":
+            dayTimeBeforeSleep();
+            break;
         case "sleepQuality":
             sleepQuality();
             break;
@@ -378,7 +495,7 @@ function getData(){
         endDateBox.value = lastDate;
 
         // nap threshold
-        const thresh = 60*120;
+        const thresh = 2;
         updateData(thresh);
 
         // remove overlay, switch to main view
@@ -392,7 +509,6 @@ function getData(){
         // histogram of sleep duration
         // plot of time in bed - time asleep (or just two lines)
         // day of week vs quality/duration
-        // day of week vs time before sleep
-
+        // day of week vs time in bed/asleep (stacked bar graphs?)
     }
 }
