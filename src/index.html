@@ -20,12 +20,11 @@
                 </div>
             </div>
         </div>
-        <!-- <button class="modal-close is-large" aria-label="close"></button> -->
     </div>
     <div id="sidebar">
         <aside class="menu">
             <!-- <p class="menu-label"> -->
-            <!--     Navigation -->
+            <!--     Charts -->
             <!-- </p> -->
             <ul class="menu-list">
                 <li>
@@ -40,7 +39,6 @@
                 <li>
                 <a>Over Time</a>
                 <ul>
-                    <!-- TODO make currently selected one stand out -->
                     <li><a onclick="sleepQuality()">Quality</a></li>
                     <li><a onclick="sleepRegularity()">Regularity</a></li>
                 </ul>
@@ -51,19 +49,32 @@
     </div>
     <section class="main">
         <div id="mainContainer">
-            <!-- <h1 class="title has-text-light"> -->
-            <!--     Hello World -->
-            <!-- </h1> -->
-            <!-- <p class="subtitle has-text-light"> -->
-            <!--     Sample text -->
-            <!-- </p> -->
-
-            <!-- TODO fill -->
             <div id="chartOptions">
+                <div id="dateEntry">
+                    <div id="dateFlexbox">
+                        <div class="dateEntryText">
+                            <p>Start Date</p>
+                        </div>
+                        <div class="dateEntryText">
+                            <p>End Date</p>
+                        </div>
+                        <div class="dateEntryField">
+                            <input class="input" id="startDate" type="text" placeholder="Start">
+                        </div>
+                        <p id="dateEntryDash"> - </p>
+                        <div class="dateEntryField" id="end">
+                            <input class="input" id="endDate" type="text" placeholder="End">
+                        </div>
+                    </div>
+                    <div id="updateButton">
+                        <button class="button" id="btnUpdate" onclick="updateData()">Update</button>
+                    </div>
+                </div>
                 <p id="chartTitle"></p>
             </div>
             <div id="chartContainer">
-                <canvas id="mainChart" style="width:100%;height:100%"></canvas>
+                <!-- <canvas id="mainChart" style="width:100%;height:100%"></canvas> -->
+                <canvas id="mainChart"></canvas>
             </div>
         </div>
     </section>

@@ -17,12 +17,13 @@ var chartColors = {
 var color = Chart.helpers.color;
 
 // globals
-var sleepData, labels, weekdayCounts, weekdayData;
+var sleepData, filteredData, labels, weekdayCounts, weekdayData;
 var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
+var currentGraph;
 var mainChart;
 
 function dayFrequency(){
+    currentGraph = "dayFrequency";
     // TODO make global
     var ctx = document.getElementById('mainChart').getContext('2d');
     // reset canvas
@@ -57,6 +58,7 @@ function dayFrequency(){
 }
 
 function dayQuality(){
+    currentGraph = "dayQuality";
     var ctx = document.getElementById('mainChart').getContext('2d');
     // reset canvas
     if (mainChart != null){
@@ -93,6 +95,7 @@ function dayQuality(){
 }
 
 function dayRegularity(){
+    currentGraph = "dayRegularity";
     var ctx = document.getElementById('mainChart').getContext('2d');
     // reset canvas
     if (mainChart != null){
@@ -128,6 +131,7 @@ function dayRegularity(){
 }
 
 function sleepQuality(){
+    currentGraph = "sleepQuality";
     var ctx = document.getElementById('mainChart').getContext('2d');
     // reset canvas
     if (mainChart != null){
@@ -137,12 +141,12 @@ function sleepQuality(){
         type: 'line',
         data: {
             // get only dates
-            labels: _.map(sleepData[labels.indexOf('Start')], function(entry) {
+            labels: _.map(filteredData[labels.indexOf('Start')], function(entry) {
                 return entry[0]; 
             }),
             datasets: [{
                 label: "Quality",
-                data: sleepData[labels.indexOf('Sleep Quality')],
+                data: filteredData[labels.indexOf('Sleep Quality')],
                 backgroundColor: color(chartColors.red).alpha(0.8).rgbString(),
                 borderWidth: 1
             }]
@@ -163,6 +167,7 @@ function sleepQuality(){
 }
 
 function sleepRegularity(){
+    currentGraph = "sleepRegularity";
     var ctx = document.getElementById('mainChart').getContext('2d');
     // reset canvas
     if (mainChart != null){
@@ -172,12 +177,12 @@ function sleepRegularity(){
         type: 'line',
         data: {
             // get only dates
-            labels: _.map(sleepData[labels.indexOf('Start')], function(entry) {
+            labels: _.map(filteredData[labels.indexOf('Start')], function(entry) {
                 return entry[0];
             }),
             datasets: [{
                 label: "Regularity",
-                data: sleepData[labels.indexOf('Regularity')],
+                data: filteredData[labels.indexOf('Regularity')],
                 backgroundColor: color(chartColors.red).alpha(0.8).rgbString(),
                 borderWidth: 1
             }]
@@ -197,7 +202,7 @@ function sleepRegularity(){
     chartTitle.innerHTML = "Sleep Regularity over Time";
 }
 
-function removeNaps(data, labels, threshold){
+function removeNaps(data, threshold){
     let ri = labels.indexOf('Time in bed (seconds)');
     let naps = [];
 
@@ -251,7 +256,7 @@ function customDomain(data, start, end){
     return dataCopy;
 }
 
-function dayOfWeekStats(days, data, labels){
+function dayOfWeekStats(days, data){
     let numericalCols = ['Sleep Quality', 'Regularity', 'Heart rate (bpm)', 'Steps', 'Air Pressure (Pa)', 'Movements per hour', 'Time in bed (seconds)', 'Time asleep (seconds)', 'Time before sleep (seconds)', 'Snore time'];
 
     let numericalColIndices = [];
@@ -290,7 +295,50 @@ function dayOfWeekStats(days, data, labels){
 
 }
 
-function getData() {
+function reloadGraph(){
+    switch(currentGraph){
+        case "dayFrequency":
+            dayFrequency();
+            break;
+        case "dayQuality":
+            dayQuality();
+            break;
+        case "dayRegularity":
+            dayRegularity();
+            break;
+        case "sleepQuality":
+            sleepQuality();
+            break;
+        case "sleepRegularity":
+            sleepRegularity();
+            break;
+        default:
+            dayFrequency();
+    }
+}
+
+function updateData(napThreshold){
+    const startDateBox = document.getElementById("startDate");
+    const endDateBox = document.getElementById("endDate");
+
+    let startDate = startDateBox.value;
+    let endDate = endDateBox.value;
+    if(startDate == ""){
+        startDate = startDateBox.placeholder;
+    }
+    if(endDate == ""){
+        endDate = endDateBox.placeholder;
+    }
+    // TODO make entered dates work with / as well as -
+
+    filteredData = removeNaps(customDomain(sleepData, startDate, endDate), napThreshold);
+
+    [weekdayCounts, weekdayData] = dayOfWeekStats(days, filteredData);
+
+    reloadGraph();
+}
+
+function getData(){
     let result = dialog.showOpenDialogSync(remote.getCurrentWindow(), {
         properties: ["openFile"],
         filters: [
@@ -308,25 +356,35 @@ function getData() {
 
     if (typeof result === "object") {
         let filePath = result[0];
-        // TODO make replacement button same size
+        // TODO make replacement button the same size
         // const browseBtn = document.getElementById("btnBrowse");
         // const spinBtn = document.createElement('a');
         // spinBtn.innerHTML = '<a class="button is-loading">Loading</a>';
         // browseBtn.parentNode.replaceChild(spinBtn, browseBtn);
 
-        // TODO make async so spinny button renders
+        // TODO make async so loading button renders
         [sleepData, labels] = ipcRenderer.sendSync('synchronous-message', filePath);
 
-        const thresh = 60*120;
-        let newData = removeNaps(sleepData, labels, thresh);
+        // get first and last date of data
+        const firstDate = sleepData[1][0][0];
+        const lastDate = sleepData[1][sleepData[1].length-1][0];
 
-        [weekdayCounts, weekdayData] = dayOfWeekStats(days, removeNaps(sleepData, labels, thresh), labels);
+        const startDateBox = document.getElementById("startDate");
+        const endDateBox = document.getElementById("endDate");
+
+        startDateBox.placeholder = firstDate;
+        endDateBox.placeholder = lastDate;
+        startDateBox.value = firstDate;
+        endDateBox.value = lastDate;
+
+        // nap threshold
+        const thresh = 60*120;
+        updateData(thresh);
 
         // remove overlay, switch to main view
         const modalOverlay = document.getElementById("overlay");
         modalOverlay.remove();
 
-        dayFrequency();
         // TODO add all graphs
         // start date vs quality (and moving average or similar?)
         // same for regularity ^

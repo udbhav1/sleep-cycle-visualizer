@@ -10,7 +10,6 @@ html {
 }
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  /* font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif; */
   margin: auto;
   /* max-width: 38rem; */
   padding: 0;
@@ -35,10 +34,57 @@ body {
 }
 
 #chartOptions {
-  height: 15%;
+  height: 20%;
   width: 100%;
   text-align: center;
   position: relative;
+}
+
+#dateEntry {
+  width: 33%;
+  float: right;
+  overflow: auto;
+}
+
+#dateFlexbox {
+  height: 20%;
+  width: 100%;
+  display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	flex-wrap: wrap;
+}
+
+.dateEntryText {
+  width: 40%;
+  margin-right: 5%;
+  margin-top: 5%;
+}
+
+.dateEntryField {
+  width: 43%;
+}
+
+#end.dateEntryField {
+  margin-right: 5%;
+}
+
+#dateEntryDash {
+  font-size: 23px;
+}
+
+#updateButton {
+  height: 20%;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+#btnUpdate {
+  margin-top: 5%;
+  margin-right: 5%;
 }
 
 #chartTitle {
