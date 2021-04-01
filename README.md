@@ -4,7 +4,7 @@ Electron app that parses and displays data from the [Sleep Cycle](https://www.sl
 
 ## Usage
 
-1. Download and install the desktop app from the [releases page]().
+1. Download and install the desktop app from the [releases page](https://github.com/udbhav1/sleep-cycle-visualizer/releases).
 
 2. Export your database from the Sleep Cycle app:
 ```
