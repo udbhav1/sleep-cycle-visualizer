@@ -42,7 +42,7 @@ var dayFrequency = {
 var dayQuality = {
     type            : "bar",
     title           : "Day of Week vs Sleep Quality",
-    dataDescription : "Avg Quality",
+    dataDescription : "Avg Quality (%)",
     xAxis           : function() {
         return days;
     },
@@ -56,7 +56,7 @@ var dayQuality = {
 var dayRegularity = {
     type            : "bar",
     title           : "Day of Week vs Sleep Regularity",
-    dataDescription : "Avg Regularity",
+    dataDescription : "Avg Regularity (%)",
     xAxis           : function() {
         return days;
     },
@@ -70,7 +70,7 @@ var dayRegularity = {
 var dayTimeInBed = {
     type            : "bar",
     title           : "Day of Week vs Time in Bed",
-    dataDescription : "Avg Time in Bed",
+    dataDescription : "Avg Time in Bed (hours)",
     xAxis           : function() {
         return days;
     },
@@ -84,7 +84,7 @@ var dayTimeInBed = {
 var dayTimeInBed = {
     type            : "bar",
     title           : "Day of Week vs Time in Bed",
-    dataDescription : "Avg Time in Bed",
+    dataDescription : "Avg Time in Bed (hours)",
     xAxis           : function() {
         return days;
     },
@@ -98,7 +98,7 @@ var dayTimeInBed = {
 var dayTimeAsleep = {
     type            : "bar",
     title           : "Day of Week vs Time Asleep",
-    dataDescription : "Avg Time Asleep",
+    dataDescription : "Avg Time Asleep (hours)",
     xAxis           : function() {
         return days;
     },
@@ -112,7 +112,7 @@ var dayTimeAsleep = {
 var dayTimeBeforeSleep = {
     type            : "bar",
     title           : "Day of Week vs Time Before Sleep",
-    dataDescription : "Avg Time Before Sleep",
+    dataDescription : "Avg Time Before Sleep (hours)",
     xAxis           : function() {
         return days;
     },
@@ -126,7 +126,7 @@ var dayTimeBeforeSleep = {
 var sleepQuality = {
     type            : "line",
     title           : "Sleep Quality over Time",
-    dataDescription : "Quality",
+    dataDescription : "Quality (%)",
     xAxis           : function() {
         return _.map(filteredData[labels.indexOf('Start')], function(entry) {
                     return entry[0]; 
@@ -140,7 +140,7 @@ var sleepQuality = {
 var sleepRegularity = {
     type            : "line",
     title           : "Sleep Regularity over Time",
-    dataDescription : "Regularity",
+    dataDescription : "Regularity (%)",
     xAxis           : function() {
         return _.map(filteredData[labels.indexOf('Start')], function(entry) {
                     return entry[0];
@@ -205,6 +205,7 @@ function createChart(name){
     chartTitle.innerHTML = title;
 }
 
+// remove all entries with a duration below a certain threshold
 function removeNaps(data, threshold){
     let ri = labels.indexOf('Time in bed (seconds)');
     let naps = [];
@@ -235,6 +236,7 @@ function dateGreaterEqual(a, b){
     return aD >= bD;
 }
 
+// set custom date range
 function customDomain(data, start, end){
     // deep copy
     let dataCopy = JSON.parse(JSON.stringify(data));
@@ -296,10 +298,10 @@ function dayOfWeekStats(days, data){
 
 }
 
+// update filteredData based on UI options and reload current chart
 function updateData(){
     const startDateBox = document.getElementById("startDate");
     const endDateBox = document.getElementById("endDate");
-
     let startDate = startDateBox.value;
     let endDate = endDateBox.value;
     if(startDate == ""){
@@ -366,7 +368,7 @@ function getData(){
         // start date vs quality (and moving average or similar?)
         // same for regularity ^
         // duration vs quality
-        // histogram of sleep duration
+        // histogram of sleep duration (like on the website) with nap filtering disabled
         // plot of time in bed - time asleep (or just two lines)
         // day of week vs quality/duration
         // day of week vs time in bed/asleep (stacked bar graphs?)
