@@ -19,7 +19,7 @@ var color = Chart.helpers.color;
 // globals
 var sleepData, filteredData, labels, weekdayCounts, weekdayData;
 var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-var napThreshold = 2;
+var defaultNapThreshold = "2.0"; // string so it shows as 2.0 in UI
 var currentChart = "dayFrequency";
 var mainChart;
 
@@ -224,9 +224,10 @@ function removeNaps(data, threshold){
     naps.reverse();
     for(var j = 0; j < naps.length; j++){
         for(var i = 0; i < dataCopy.length; i++){
-            dataCopy[i].splice(j, 1);
+            dataCopy[i].splice(naps[j], 1);
         }
     }
+
     return dataCopy;
 }
 
@@ -298,7 +299,7 @@ function dayOfWeekStats(days, data){
 
 }
 
-// update filteredData based on UI options and reload current chart
+// rebuild filteredData based on UI options and reload current chart
 function updateData(){
     const startDateBox = document.getElementById("startDate");
     const endDateBox = document.getElementById("endDate");
@@ -311,6 +312,9 @@ function updateData(){
         endDate = endDateBox.placeholder;
     }
     // TODO make entered dates work with / as well as -
+
+    const napBox = document.getElementById("napThreshold");
+    let napThreshold = parseFloat(napBox.value);
 
     filteredData = removeNaps(customDomain(sleepData, startDate, endDate), napThreshold);
 
@@ -354,9 +358,16 @@ function getData(){
         const endDateBox = document.getElementById("endDate");
 
         startDateBox.placeholder = firstDate;
-        endDateBox.placeholder = lastDate;
         startDateBox.value = firstDate;
+        endDateBox.placeholder = lastDate;
         endDateBox.value = lastDate;
+
+
+        // set nap threshold box to default
+        const napBox = document.getElementById("napThreshold");
+
+        napBox.placeholder = defaultNapThreshold;
+        napBox.value = defaultNapThreshold;
 
         updateData();
 

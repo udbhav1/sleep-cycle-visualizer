@@ -53,6 +53,7 @@
     <section class="main">
         <div id="mainContainer">
             <div id="chartOptions">
+                <!-- in order from right to left -->
                 <div id="dateEntry">
                     <div id="dateFlexbox">
                         <div class="dateEntryText">
@@ -73,7 +74,28 @@
                         <button class="button" id="btnUpdate" onclick="updateData()">Update</button>
                     </div>
                 </div>
+
+                <div id="napEntry">
+                    <div id="napFlexbox">
+                        <div id="napEntryText">
+                            <p>Nap Threshold</p>
+                        </div>
+                        <div id="napEntryField">
+                            <div class="field has-addons">
+                                <p class="control">
+                                    <input class="input" id="napThreshold" type="text" placeholder="hours">
+                                </p>
+                                <p class="control">
+                                    <a class="button is-static">hours</a>
+                                </p>
+                            </div>
+                            <!-- <input class="input" id="napThreshold" type="text" placeholder="hours"> -->                        
+                        </div>
+                    </div>
+                </div>
+
                 <p id="chartTitle"></p>
+
             </div>
             <div id="chartContainer">
                 <!-- <canvas id="mainChart" style="width:100%;height:100%"></canvas> -->
