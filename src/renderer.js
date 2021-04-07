@@ -20,6 +20,8 @@ var color = Chart.helpers.color;
 var sleepData, filteredData, labels, weekdayCounts, weekdayData;
 var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 var defaultNapThreshold = "2.0"; // string so it shows as 2.0 in UI
+var animationsEnabled = true;
+var animationDuration = 1000; // milliseconds
 var currentChart = "dayFrequency";
 var mainChart;
 
@@ -198,6 +200,9 @@ function createChart(name){
                         beginAtZero: true
                     }
                 }]
+            },
+            animation: {
+                duration: animationsEnabled ? animationDuration : 0
             }
         }
     });
@@ -320,6 +325,9 @@ function updateData(){
 
     [weekdayCounts, weekdayData] = dayOfWeekStats(days, filteredData);
 
+    const animationBox = document.getElementById("animationCheckbox");
+    animationsEnabled = animationBox.checked;
+
     createChart(currentChart);
 }
 
@@ -368,6 +376,10 @@ function getData(){
 
         napBox.placeholder = defaultNapThreshold;
         napBox.value = defaultNapThreshold;
+
+        // set animation checkbox to default
+        const animationBox = document.getElementById("animationCheckbox");
+        animationBox.checked = animationsEnabled;
 
         updateData();
 
