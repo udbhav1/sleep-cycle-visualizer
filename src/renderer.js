@@ -22,6 +22,7 @@ var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'S
 var defaultNapThreshold = "2.0"; // string so it shows as 2.0 in UI
 var animationsEnabled = true;
 var animationDuration = 1000; // milliseconds
+var roundDigits = 3; // number of digits after decimal
 var currentChart = "dayFrequency";
 var mainChart;
 
@@ -267,6 +268,11 @@ function customDomain(data, start, end){
     return dataCopy;
 }
 
+function floatRound(val){
+    console.log(val);
+    return Math.round(val * (10**roundDigits)) / (10**roundDigits);    
+}
+
 function dayOfWeekStats(days, data){
     let numericalColIndices = [];
     
@@ -283,7 +289,6 @@ function dayOfWeekStats(days, data){
 
     let dayCounts = _.range(days.length).map(function () {return 0.0;})
 
-
     // calc sums of relevant cols
     for(var i = 0; i < data[0].length; i++){
         let curDay = data[0][i];
@@ -296,12 +301,11 @@ function dayOfWeekStats(days, data){
     // calc avg
     dayData = _.map(dayData, function(day, dayInd) {
         return _.map(day, function (el, i) {
-            return el/dayCounts[dayInd];
+            return floatRound(el/dayCounts[dayInd]);
         });
     });
 
     return [dayCounts, dayData];
-
 }
 
 // rebuild filteredData based on UI options and reload current chart
