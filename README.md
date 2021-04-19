@@ -17,6 +17,12 @@ Profile -> Settings -> More -> Database -> Export Database
 ![bar-chart](./assets/bar-chart.png)
 ![line-chart](./assets/line-chart.png)
 
+## Features
+- Enter custom date ranges
+- Ignore nights under a certain length
+- Toggle chart animations
+- Several graphs, with more to come!
+
 ## Development
 
 ```
