@@ -28,7 +28,7 @@
             <!-- </p> -->
             <ul class="menu-list">
                 <li>
-                <a>Day of Week</a>
+                    <a>Day of Week</a>
                 <ul>
                     <!-- TODO make currently selected one stand out -->
                     <li><a onclick="createChart('dayFrequency')">Frequency</a></li>
@@ -39,14 +39,21 @@
                     <li><a onclick="createChart('dayTimeBeforeSleep')">Time Before Sleep</a></li>
                 </ul>
                 </li>
+
                 <li>
-                <a>Over Time</a>
+                    <a>Over Time</a>
                 <ul>
                     <li><a onclick="createChart('sleepQuality')">Quality</a></li>
                     <li><a onclick="createChart('sleepRegularity')">Regularity</a></li>
                 </ul>
                 </li>
 
+                <li>
+                    <a>Histograms</a>
+                <ul>
+                    <li><a onclick="createChart('sleepDuration')">Duration</a></li>
+                </ul>
+                </li>
             </ul>
         </aside>
     </div>

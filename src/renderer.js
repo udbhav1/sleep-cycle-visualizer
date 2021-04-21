@@ -17,7 +17,7 @@ var chartColors = {
 var color = Chart.helpers.color;
 
 // globals
-var sleepData, filteredData, labels, weekdayCounts, weekdayData;
+var sleepData, filteredData, labels, weekdayCounts, weekdayData, histogramData;
 var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 var defaultNapThreshold = "2.0"; // string so it shows as 2.0 in UI
 var animationsEnabled = true;
@@ -33,7 +33,7 @@ var numericalCols = ['Sleep Quality', 'Regularity', 'Heart rate (bpm)', 'Steps',
 var dayFrequency = {
     type            : "bar",
     title           : "Day of Week vs Frequency",
-    dataDescription : "# of Occurences",
+    dataDescription : "# of Occurrences",
     xAxis           : function() {
         return days;
     },
@@ -154,6 +154,35 @@ var sleepRegularity = {
     }
 };
 
+var sleepDuration = {
+    type            : "histogram",
+    title           : "Sleep Duration Histogram",
+    dataDescription : "Percent",
+    bins            : null,
+    xAxis           : function() {
+        // so that the data function can access it too
+        this.bins = generateBins(filteredData[labels.indexOf('Time in bed (seconds)')]);
+        return this.bins;
+    },
+    data            : function() {
+        let counts = new Array(this.bins.length-1).fill(0);
+        let tot = 0;
+        for(var ite of filteredData[labels.indexOf('Time in bed (seconds)')]){
+            tot++;
+            for(var i = 0; i < this.bins.length-1; i++){
+                if(ite > this.bins[i] && ite < this.bins[i+1]){
+                    counts[i] += 1;
+                    break;
+                }
+            }
+        }
+        for(var i = 0; i < counts.length; i++){
+            counts[i] = floatRound(counts[i]*100/tot);
+        }
+        return counts;
+    }
+};
+
 // used to find correct chart object and to set current chart for reload
 var charts = {
     "dayFrequency": dayFrequency,
@@ -163,7 +192,8 @@ var charts = {
     "dayTimeAsleep": dayTimeAsleep,
     "dayTimeBeforeSleep": dayTimeBeforeSleep,
     "sleepQuality": sleepQuality,
-    "sleepRegularity": sleepRegularity
+    "sleepRegularity": sleepRegularity,
+    "sleepDuration": sleepDuration
 }
 
 function createChart(name){
@@ -175,6 +205,24 @@ function createChart(name){
     let description = chartObj.dataDescription;
     let xLabels = chartObj.xAxis();
     let chartData = chartObj.data();
+
+    let histogramOptions = [];
+    if(chartObj.type == "histogram"){
+        chartType = "bar";
+        histogramOptions = [{
+                                display: false,
+                                barPercentage: 1.25,
+                                ticks: {
+                                    max: xLabels[xLabels.length-2]
+                                }
+                            }, {
+                                display: true,
+                                ticks: {
+                                    autoSkip: false,
+                                    max: xLabels[xLabels.length-1]
+                                }
+                            }];
+    }
 
     var ctx = document.getElementById('mainChart').getContext('2d');
     // reset canvas
@@ -196,6 +244,7 @@ function createChart(name){
         options: {
             maintainAspectRatio: false,
             scales: {
+                xAxes: histogramOptions, 
                 yAxes: [{
                     ticks: {
                         beginAtZero: true
@@ -269,7 +318,6 @@ function customDomain(data, start, end){
 }
 
 function floatRound(val){
-    console.log(val);
     return Math.round(val * (10**roundDigits)) / (10**roundDigits);    
 }
 
@@ -306,6 +354,45 @@ function dayOfWeekStats(days, data){
     });
 
     return [dayCounts, dayData];
+}
+
+// generate evenly spaced bins, currently unused because float bounds are ugly
+function generateEvenBins(numData){
+    let bins = Math.ceil(Math.sqrt(numData.length));
+    let minval = Math.floor(Math.min(...numData));
+    let maxval = Math.ceil(Math.max(...numData));
+
+    let binBounds = _.range(minval, maxval, (maxval-minval)/(bins-1));
+    // if float step
+    if(binBounds[binBounds.length-1] != maxval){
+        binBounds.push(maxval);
+    }
+    binBounds = _.map(binBounds, function(val){ 
+        return floatRound(val);
+    });
+    return binBounds;
+}
+
+// generate bins with only whole number bounds
+function generateBins(numData){ 
+    let minval = Math.floor(Math.min(...numData));
+    let maxval = Math.ceil(Math.max(...numData));
+
+    let delta = maxval - minval;
+    let step;
+    if(delta < 10){
+        step = 1;
+    }
+    else if(delta < 50){
+        step = 5;
+    }
+    else if(delta < 100){
+        step = 10;
+    }
+    else{
+        return generateEvenBins(numData);
+    }
+    return _.range(minval, maxval, step);
 }
 
 // rebuild filteredData based on UI options and reload current chart
