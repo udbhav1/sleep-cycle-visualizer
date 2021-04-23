@@ -34,6 +34,8 @@ var dayFrequency = {
     type            : "bar",
     title           : "Day of Week vs Frequency",
     dataDescription : "# of Occurrences",
+    xTitle          : "",
+    yTitle          : "",
     xAxis           : function() {
         return days;
     },
@@ -46,6 +48,8 @@ var dayQuality = {
     type            : "bar",
     title           : "Day of Week vs Sleep Quality",
     dataDescription : "Avg Quality (%)",
+    xTitle          : "",
+    yTitle          : "",
     xAxis           : function() {
         return days;
     },
@@ -60,6 +64,8 @@ var dayRegularity = {
     type            : "bar",
     title           : "Day of Week vs Sleep Regularity",
     dataDescription : "Avg Regularity (%)",
+    xTitle          : "",
+    yTitle          : "",
     xAxis           : function() {
         return days;
     },
@@ -74,6 +80,8 @@ var dayTimeInBed = {
     type            : "bar",
     title           : "Day of Week vs Time in Bed",
     dataDescription : "Avg Time in Bed (hours)",
+    xTitle          : "",
+    yTitle          : "",
     xAxis           : function() {
         return days;
     },
@@ -88,6 +96,8 @@ var dayTimeAsleep = {
     type            : "bar",
     title           : "Day of Week vs Time Asleep",
     dataDescription : "Avg Time Asleep (hours)",
+    xTitle          : "",
+    yTitle          : "",
     xAxis           : function() {
         return days;
     },
@@ -102,6 +112,8 @@ var dayTimeBeforeSleep = {
     type            : "bar",
     title           : "Day of Week vs Time Before Sleep",
     dataDescription : "Avg Time Before Sleep (hours)",
+    xTitle          : "",
+    yTitle          : "",
     xAxis           : function() {
         return days;
     },
@@ -116,6 +128,8 @@ var sleepQuality = {
     type            : "line",
     title           : "Sleep Quality over Time",
     dataDescription : "Quality (%)",
+    xTitle          : "",
+    yTitle          : "",
     xAxis           : function() {
         return _.map(filteredData[labels.indexOf('Start')], function(entry) {
                     return entry[0]; 
@@ -130,6 +144,8 @@ var sleepRegularity = {
     type            : "line",
     title           : "Sleep Regularity over Time",
     dataDescription : "Regularity (%)",
+    xTitle          : "",
+    yTitle          : "",
     xAxis           : function() {
         return _.map(filteredData[labels.indexOf('Start')], function(entry) {
                     return entry[0];
@@ -144,6 +160,8 @@ var sleepDuration = {
     type            : "histogram",
     title           : "Sleep Duration Histogram",
     dataDescription : "Percent",
+    xTitle          : "",
+    yTitle          : "",
     bins            : null,
     xAxis           : function() {
         // so that the data function can access it too
@@ -173,6 +191,8 @@ var durationQuality = {
     type            : "scatter",
     title           : "Sleep Duration vs Sleep Quality",
     dataDescription : "Point",
+    xTitle          : "Time Asleep (hours)",
+    yTitle          : "Percent Quality",
     xAxis           : function() {
         return filteredData[labels.indexOf('Time asleep (seconds)')];
     },
@@ -209,26 +229,32 @@ function createChart(name){
     let chartType = chartObj.type;
     let title = chartObj.title;
     let description = chartObj.dataDescription;
+    let xTitle = chartObj.xTitle;
+    let yTitle = chartObj.yTitle;
     let xLabels = chartObj.xAxis();
     let chartData = chartObj.data();
 
     // by default not a histogram
-    let histogramOptions = [];
+    let xAxisOptions = [{scaleLabel: { display: true, labelString: xTitle}}];
     if(chartObj.type == "histogram"){
+        // remove x axis label - doesnt play well with histogram
+        xAxisOptions = [];
         chartType = "bar";
-        histogramOptions = [{
+        // hack to move ticks to either side of bar
+        xAxisOptions.push({
                                 display: false,
                                 barPercentage: 1.25,
                                 ticks: {
                                     max: xLabels[xLabels.length-2]
                                 }
-                            }, {
+                            });
+        xAxisOptions.push({
                                 display: true,
                                 ticks: {
                                     autoSkip: false,
                                     max: xLabels[xLabels.length-1]
                                 }
-                            }];
+                            });
     }
 
     var ctx = document.getElementById('mainChart').getContext('2d');
@@ -251,8 +277,12 @@ function createChart(name){
         options: {
             maintainAspectRatio: false,
             scales: {
-                xAxes: histogramOptions, 
+                xAxes: xAxisOptions, 
                 yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: yTitle
+                    },
                     ticks: {
                         beginAtZero: true
                     }
