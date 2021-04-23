@@ -84,20 +84,6 @@ var dayTimeInBed = {
     }
 };
 
-var dayTimeInBed = {
-    type            : "bar",
-    title           : "Day of Week vs Time in Bed",
-    dataDescription : "Avg Time in Bed (hours)",
-    xAxis           : function() {
-        return days;
-    },
-    data            : function() {
-        return _.map(weekdayData, function(dayData) {
-                    return dayData[labels.indexOf('Time in bed (seconds)')];
-                });
-    }
-};
-
 var dayTimeAsleep = {
     type            : "bar",
     title           : "Day of Week vs Time Asleep",
@@ -183,6 +169,25 @@ var sleepDuration = {
     }
 };
 
+var durationQuality = {
+    type            : "scatter",
+    title           : "Sleep Duration vs Sleep Quality",
+    dataDescription : "Point",
+    xAxis           : function() {
+        return filteredData[labels.indexOf('Time asleep (seconds)')];
+    },
+    data            : function() {
+        let timeInd = labels.indexOf('Time asleep (seconds)');
+        let qualityInd = labels.indexOf('Sleep Quality');
+        let coords = [];
+        for(var i = 0; i < filteredData[timeInd].length; i++){
+            let coord = {x: floatRound(filteredData[timeInd][i]), y: filteredData[qualityInd][i]};
+            coords.push(coord);
+        }
+        return coords;
+    }
+};
+
 // used to find correct chart object and to set current chart for reload
 var charts = {
     "dayFrequency": dayFrequency,
@@ -193,7 +198,8 @@ var charts = {
     "dayTimeBeforeSleep": dayTimeBeforeSleep,
     "sleepQuality": sleepQuality,
     "sleepRegularity": sleepRegularity,
-    "sleepDuration": sleepDuration
+    "sleepDuration": sleepDuration,
+    "durationQuality": durationQuality
 }
 
 function createChart(name){
@@ -206,6 +212,7 @@ function createChart(name){
     let xLabels = chartObj.xAxis();
     let chartData = chartObj.data();
 
+    // by default not a histogram
     let histogramOptions = [];
     if(chartObj.type == "histogram"){
         chartType = "bar";
@@ -478,13 +485,7 @@ function getData(){
         const modalOverlay = document.getElementById("overlay");
         modalOverlay.remove();
 
-        // TODO add all graphs
-        // start date vs quality (and moving average or similar?)
-        // same for regularity ^
-        // duration vs quality
-        // histogram of sleep duration (like on the website) with nap filtering disabled
+        // duration vs quality scatterplot with trendline and r^2
         // plot of time in bed - time asleep (or just two lines)
-        // day of week vs quality/duration
-        // day of week vs time in bed/asleep (stacked bar graphs?)
     }
 }
