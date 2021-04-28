@@ -20,10 +20,12 @@ var color = Chart.helpers.color;
 var sleepData, filteredData, labels, weekdayCounts, weekdayData, histogramData;
 var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 var defaultNapThreshold = "2.0"; // string so it shows as 2.0 in UI
+var defaultWiggleRoom = "3.0";
 var animationsEnabled = true;
 var animationDuration = 1000; // milliseconds
+var axesEnabled = true;
 var roundDigits = 3; // number of digits after decimal
-var currentChart = "dayFrequency";
+var currentChart = "dayQuality";
 var mainChart;
 
 // used by day of week stats function
@@ -190,7 +192,7 @@ var sleepDuration = {
 var durationQuality = {
     type            : "scatter",
     title           : "Sleep Duration vs Sleep Quality",
-    dataDescription : "Point",
+    dataDescription : "Points",
     xTitle          : "Time Asleep (hours)",
     yTitle          : "Percent Quality",
     xAxis           : function() {
@@ -233,9 +235,30 @@ function createChart(name){
     let yTitle = chartObj.yTitle;
     let xLabels = chartObj.xAxis();
     let chartData = chartObj.data();
+    let showAxes = axesEnabled;
+
+    // if the chart doesnt need axes then don't show empty label because that adds margin
+    if(xTitle == "" && yTitle == ""){
+        showAxes = false;
+    }
+
+    let yAxisOptions = showAxes ? [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: yTitle
+                        },
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }] : 
+                    [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
 
     // by default not a histogram
-    let xAxisOptions = [{scaleLabel: { display: true, labelString: xTitle}}];
+    let xAxisOptions = showAxes ? [{scaleLabel: { display: true, labelString: xTitle}}] : [];
     if(chartObj.type == "histogram"){
         // remove x axis label - doesnt play well with histogram
         xAxisOptions = [];
@@ -278,15 +301,7 @@ function createChart(name){
             maintainAspectRatio: false,
             scales: {
                 xAxes: xAxisOptions, 
-                yAxes: [{
-                    scaleLabel: {
-                        display: true,
-                        labelString: yTitle
-                    },
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }]
+                yAxes: yAxisOptions
             },
             animation: {
                 duration: animationsEnabled ? animationDuration : 0
@@ -335,14 +350,15 @@ function customDomain(data, start, end){
     let dataCopy = JSON.parse(JSON.stringify(data));
     let startValid = -1;
     let endValid = 0;
+    let startIndex = labels.indexOf("Start");
 
-    for(var i = 0; i < dataCopy[1].length; i++){
-        if(dateGreaterEqual(dataCopy[1][i][0], start)){
+    for(var i = 0; i < dataCopy[startIndex].length; i++){
+        if(dateGreaterEqual(dataCopy[startIndex][i][0], start)){
             if(startValid == -1){
                 startValid = i;
                 endValid = i;
             }
-            else if(dateGreaterEqual(end, dataCopy[1][i][0])){
+            else if(dateGreaterEqual(end, dataCopy[startIndex][i][0])){
                 endValid++;
             }
         }
@@ -350,6 +366,28 @@ function customDomain(data, start, end){
 
     for(var i = 0; i < dataCopy.length; i++){
         dataCopy[i] = dataCopy[i].slice(startValid, endValid+1);
+    }
+    return dataCopy;
+}
+
+// adjusts nights that start up to "tol" hours after midnight so that they start on the previous day 
+// (prevents a wednesday being repeated because one record started at 1 AM and another at 11 PM)
+// only useful for day of week graphs
+function lateNights(data, tol){
+    // deep copy
+    let dataCopy = JSON.parse(JSON.stringify(data));
+    let dayIndex = labels.indexOf("Day of Week");
+    let startIndex = labels.indexOf("Start");
+    let timeThreshold = "03:00:00";
+
+    for(var i = 0; i < dataCopy[0].length; i++){
+        // direct string comparison works because its HH:MM:SS
+        if(dataCopy[startIndex][i][1] < timeThreshold){
+            console.log(dataCopy[startIndex][i][1]);
+            let curDay = dataCopy[dayIndex][i];
+            // move to previous day of week
+            dataCopy[dayIndex][i] = days[(days.indexOf(curDay) + 6) % 7];
+        }
     }
     return dataCopy;
 }
@@ -449,12 +487,18 @@ function updateData(){
     const napBox = document.getElementById("napThreshold");
     let napThreshold = parseFloat(napBox.value);
 
-    filteredData = removeNaps(customDomain(sleepData, startDate, endDate), napThreshold);
+    const wiggleBox = document.getElementById("wiggleRoom");
+    let wiggleRoom = parseFloat(wiggleBox.value);
+
+    filteredData = lateNights(removeNaps(customDomain(sleepData, startDate, endDate), napThreshold), wiggleRoom);
 
     [weekdayCounts, weekdayData] = dayOfWeekStats(days, filteredData);
 
     const animationBox = document.getElementById("animationCheckbox");
     animationsEnabled = animationBox.checked;
+
+    const axisBox = document.getElementById("axisCheckbox");
+    axesEnabled = axisBox.checked;
 
     createChart(currentChart);
 }
@@ -509,13 +553,21 @@ function getData(){
         const animationBox = document.getElementById("animationCheckbox");
         animationBox.checked = animationsEnabled;
 
+        // set axis checkbox to default
+        const axisBox = document.getElementById("axisCheckbox");
+        axisBox.checked = axesEnabled;
+
+        // set wiggle room box to default
+        const wiggleBox = document.getElementById("wiggleRoom");
+
+        wiggleBox.placeholder = defaultWiggleRoom;
+        wiggleBox.value = defaultWiggleRoom;
+
         updateData();
 
         // remove overlay, switch to main view
         const modalOverlay = document.getElementById("overlay");
         modalOverlay.remove();
 
-        // duration vs quality scatterplot with trendline and r^2
-        // plot of time in bed - time asleep (or just two lines)
     }
 }

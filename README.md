@@ -12,16 +12,21 @@ Profile -> Settings -> More -> Database -> Export Database
 ```
 3. Move that CSV to your computer and select it when prompted in the desktop app.
 
+If you just want to test the app, feel free to use the sample-sleepdata.csv included in the repo.
+
 ## Gallery
 
-![bar-chart](./assets/bar-chart.png)
-![line-chart](./assets/line-chart.png)
+![histogram](./assets/histogram.png)
+![scatterplot](./assets/scatterplot.png)
+![line](./assets/line.png)
 
 ## Features
+- Bar charts, Line charts, Histograms, and Scatterplots
 - Enter custom date ranges
-- Ignore nights under a certain length
+- Set nap threshold to ignore nights under a certain length
+- Set "wiggle room" so that late nights starting up to X hours after midnight are counted as the previous day
 - Toggle chart animations
-- Several graphs, with more to come!
+- Toggle axis labels
 
 ## Development
 
