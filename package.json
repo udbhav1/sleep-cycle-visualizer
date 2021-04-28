@@ -1,7 +1,7 @@
 {
   "name": "sleep-cycle-visualizer",
   "productName": "Sleep Cycle Visualizer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "GUI to visualize data from Sleep Cycle app",
   "main": "src/index.js",
   "scripts": {

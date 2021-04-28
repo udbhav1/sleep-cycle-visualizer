@@ -383,7 +383,6 @@ function lateNights(data, tol){
     for(var i = 0; i < dataCopy[0].length; i++){
         // direct string comparison works because its HH:MM:SS
         if(dataCopy[startIndex][i][1] < timeThreshold){
-            console.log(dataCopy[startIndex][i][1]);
             let curDay = dataCopy[dayIndex][i];
             // move to previous day of week
             dataCopy[dayIndex][i] = days[(days.indexOf(curDay) + 6) % 7];
